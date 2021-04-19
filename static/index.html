@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Recorded Call Transcription</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Recorded Call Transcription" />
+    <meta name="author" content="Deepgram" />
+    <link href="/static/main.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Cairo:400,600,700,900|Source+Sans+Pro|Fira+Code|Material+Icons"
+        rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: "Source Sans Pro", sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-darkcharcoal text-white flex flex-col items-center max-w-screen-lg mx-auto">
+    <img class="block mt-5 self-start" src="/static/dg-logo-coral.svg" />
+    <h2 class="mt-10 text-casper font-bold">DEEPGRAM SPEECH RECOGNITION</h2>
+    <h1 class="text-5xl font-semibold font-cairo">Recorded Call Transcription</h1>
+
+    <div class="flex flex-row space-x-8 mt-10">
+        <a class="border-2 border-solid text-mint py-2 w-60 rounded-md font-bold text-center" id="edit-on-glitch-button"
+            target="_blank" hidden>Edit on Glitch</a>
+        <a class="text-darkcharcoal bg-mint py-2 w-60 rounded-md font-bold text-center"
+            href="https://github.com/deepgram/recorded-call-transcription" target="_blank">See in Github</a>
+        <script>
+            const editOnGlitchNode = document.querySelector("#edit-on-glitch-button");
+            const [subdomain, ...domain] = location.host.split(".");
+            if (domain.length === 2 && domain[0] === "glitch" && domain[1] === "me") {
+                editOnGlitchNode.href = "https://glitch.com/edit/#!/" + subdomain;
+                editOnGlitchNode.hidden = false;
+            }
+        </script>
+    </div>
+    <p class="text-cloud mt-10 mb-20">
+        Get the transcription of a phone call.
+    </p>
+
+    <form id="asking-numbers-form" class="flex flex-col items-center">
+        <div class="flex flex-row space-x-10">
+            <div class="flex flex-col">
+                <label for="to-input" class="font-bold text-sm">CALL THIS PHONE NUMBER...</label>
+                <input type="text" id="to-input"
+                    class="bg-darkcharcoal p-2 border border-casper border-solid rounded-md placeholder-steel w-60"
+                    placeholder="+1-541-754-3010" required />
+            </div>
+            <div class="flex flex-col">
+                <label for="from-input" class="font-bold text-sm">FROM THIS PHONE NUMBER:</label>
+                <input type="text" id="from-input"
+                    class="bg-darkcharcoal p-2 border border-casper border-solid rounded-md placeholder-steel w-60"
+                    placeholder="+1-541-754-3010" required />
+
+            </div>
+        </div>
+        <button type="submit" id="submit-button"
+            class="in-second-screen text-darkcharcoal bg-mint py-2 w-60 rounded-md font-bold mt-20">
+            Call
+        </button>
+    </form>
+
+    <div id="show-results" class="flex-col items-start self-stretch" hidden>
+        <div>
+            <span class="font-bold">Call Duration:</span> <span id="call-duration"></span>
+        </div>
+        <div class="mt-5">
+            <span class="font-bold">Call Transcript:</span> <span id="call-transcript"></span>
+        </div>
+    </div>
+
+    <script>
+        (async function () {
+
+            const formNode = document.querySelector("#asking-numbers-form");
+            const submitButton = document.querySelector("#submit-button");
+            const fromInput = document.querySelector("#from-input");
+            const toInput = document.querySelector("#to-input");
+            const POLL_DELAY = 1000;
+
+            const resultNode = document.querySelector("#show-results");
+            const durationNode = document.querySelector("#call-duration");
+            const transcriptNode = document.querySelector("#call-transcript");
+
+            formNode.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                submitButton.textContent = "Calling...";
+                submitButton.classList.add("opacity-50", "cursor-not-allowed");
+                const resp = await fetch("/start-call/", {
+                    method: "POST",
+                    body: JSON.stringify({ from_number: fromInput.value, to_number: toInput.value })
+                });
+                const token = await resp.json();
+                console.log("token received:", token);
+                setTimeout(() => pollRecording(token), POLL_DELAY);
+            });
+
+            async function pollRecording(token) {
+                const resp = await fetch("/poll-recording/", {
+                    method: "POST",
+                    body: JSON.stringify(token)
+                });
+                const jsonResp = await resp.json();
+                if (jsonResp.status === "CALL_NOT_STARTED") {
+                    console.log("call not started");
+                    setTimeout(() => pollRecording(token), POLL_DELAY);
+                } else if (jsonResp.status === "CALL_STARTED") {
+                    submitButton.textContent = "Call in progress...";
+                    setTimeout(() => pollRecording(token), POLL_DELAY);
+                } else if (jsonResp.status === "CALL_ENDED") {
+                    submitButton.textContent = "Transcription in progress...";
+                    await transcribe(jsonResp.audio_url)
+                }
+            }
+
+            async function transcribe(audioUrl) {
+                const resp = await fetch("/transcribe/", {
+                    method: "POST",
+                    body: JSON.stringify({ audio_url: audioUrl })
+                });
+                const jsonResp = await resp.json();
+                formNode.hidden = true;
+                formNode.classList.remove("flex");
+                resultNode.hidden = false;
+                resultNode.classList.add("flex");
+
+                const duration = jsonResp.metadata.duration;
+                durationNode.textContent = Math.round(duration / 60).toString().padStart(2, "0") + ":" +
+                    Math.round(duration % 60).toString().padStart(2, "0");
+                transcriptNode.textContent = jsonResp.results.channels[0].alternatives[0].transcript;
+            }
+
+        })()
+    </script>
+
+</body>
+
+</html>
