@@ -53,7 +53,7 @@ def start_call() -> dict:
 
     return { "recording_sub_url": recording_sub_url }
 
-@app.route('/poll-recording/', methods=['POST'])
+@app.route('/get-recording/', methods=['POST'])
 def poll_recording() -> dict:
     body = json.loads(request.data)
     print("got request in poll_recording:", body)

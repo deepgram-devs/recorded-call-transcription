@@ -98,7 +98,7 @@
             });
 
             async function pollRecording(token) {
-                const resp = await fetch("/poll-recording/", {
+                const resp = await fetch("/get-recording/", {
                     method: "POST",
                     body: JSON.stringify(token)
                 });
