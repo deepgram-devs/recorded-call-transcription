@@ -18,7 +18,7 @@ load_dotenv()  # take environment variables from .env.
 
 TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
 TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
-DEEPGRAM_API_KEY = os.environ['DEEPGRAM_API_KEY']
+DEEPGRAM_API_KEY = os.environ['DG_KEY']
 
 app = Flask(__name__, static_url_path="/static/", static_folder="static")
 
@@ -85,8 +85,9 @@ def transcribe() -> dict:
     print('sending recording to deepgram')
     # submit the recording to deepgram
     deepgram_req = requests.post(
-        'https://brain.deepgram.com/v2/listen?punctuate=true',
-        headers={"Authorization": "token" + DEEPGRAM_API_KEY},
+        'https://dev.brain.deepgram.com:8090/v1/listen?punctuate=true',
+        headers={'Authorization': 'token ' + DEEPGRAM_API_KEY,
+                 "content-type": "application/json"},
         json={"url": body["audio_url"]}
     )
     print('done processing request, sending deepgram response back to client',
