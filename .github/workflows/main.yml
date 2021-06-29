@@ -1,12 +1,8 @@
-# This is a basic workflow to help you get started with Actions
+name: Glitch
 
-name: CI
-
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   repo-sync:
@@ -15,7 +11,7 @@ jobs:
       - name: repo-sync
         uses: wei/git-sync@v3
         with:
-          source_repo: "https://github.com/deepgram/recorded-call-transcription.git"
-          source_branch: "master"
+          source_repo: "https://github.com/deepgram-devs/recorded-call-transcription.git"
+          source_branch: "main"
           destination_repo: ${{ secrets.GLITCH_GIT_URL }}
-          destination_branch: "master"
+          destination_branch: "main"
