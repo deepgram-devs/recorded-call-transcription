@@ -2,8 +2,10 @@
 
 [![Remix on Glitch](https://img.shields.io/badge/Glitch-remix-blue?logo=glitch)](#remix-on-glitch)
 
-This app aims to demonstrate how to use Deepgram API to transcribe
-a phone call recorded through [Twilio](https://www.twilio.com/).
+There is a wealth of knowledge in the conversations that happen in your sales and
+support calls that can be left untapped without automatic transcription. This app
+aims to demonstrate how to use Deepgram API to transcribe a phone call recorded
+through [Twilio](https://www.twilio.com/).
 
 ## Prerequisites
 
