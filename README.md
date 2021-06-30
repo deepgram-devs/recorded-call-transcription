@@ -50,6 +50,16 @@ git clone https://github.com/deepgram-devs/recorded-call-transcription.git
 cd recorded-call-transcription
 ```
 
+#### Configure the settings
+
+Your application will need to know more about you before it can run. Copy the
+`.env-example` file into a new file named `.env` and edit this new file to
+reflect the settings you want to use:
+
+- `DG_KEY`: The Deepgram API key you created earlier in this tutorial.
+- `YOUR_TWILIO_ACCOUNT_SID`: The Account SID from your Twilio Account Dashboard
+- `YOUR_TWILIO_AUTH_TOKEN`: The Auth Token from your Twilio Account Dashboard
+
 #### Create a virtual environment (optional)
 
 Create a virtual Python environnement to run the server in an isolated
