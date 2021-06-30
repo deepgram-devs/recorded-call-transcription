@@ -62,19 +62,19 @@ reflect the settings you want to use:
 
 #### Create a virtual environment (optional)
 
-Create a virtual Python environnement to run the server in an isolated
-environnement and prevent version collisions with other projects
+Create a virtual Python environment to run the server in an isolated
+environment and prevent version collisions with other projects
 (you can skip this part if you don't mind installing things "system-wide").
 
 ```bash
-# create the virtual environnement
+# create the virtual environment
 # (has to be run only once)
 python3 -m venv dg-twilio-ve
-# activate the virtual envrionnement
+# activate the virtual environment
 # (has to be run every time you open a new terminal)
 source dg-twilio-ve/bin/activate
 # your prompt should start with `(dg-twilio-ve)`.
-# Now python3 and pip3 will run in this virtual environnement.
+# Now python3 and pip3 will run in this virtual environment.
 # If you want to deactivate this env, just type `deactivate`.
 ```
 
