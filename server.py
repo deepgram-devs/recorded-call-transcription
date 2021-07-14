@@ -5,6 +5,9 @@ from flask import (Flask, request)
 # twilio helper library
 from twilio.rest import Client  # type: ignore
 
+# deepgram sdk
+from deepgram import Deepgram
+
 # other imports
 import time
 import requests
@@ -84,12 +87,8 @@ def transcribe() -> dict:
     print("got request in transcribe:", body)
     print('sending recording to deepgram')
     # submit the recording to deepgram
-    deepgram_req = requests.post(
-        'https://dev.brain.deepgram.com:8090/v1/listen?punctuate=true',
-        headers={'Authorization': 'token ' + DEEPGRAM_API_KEY,
-                 "content-type": "application/json"},
-        json={"url": body["audio_url"]}
-    )
+    client = Deepgram(DEEPGRAM_API_KEY)
+    deepgram_res = client.transcription.prerecorded({"url": body["audio_url"]}, {"punctuate": True})
     print('done processing request, sending deepgram response back to client',
-          deepgram_req.text)
-    return json.loads(deepgram_req.text)
+          deepgram_res)
+    return deepgram_res
