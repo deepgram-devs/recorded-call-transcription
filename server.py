@@ -14,6 +14,7 @@ import requests
 import json
 import os
 import uuid
+import asyncio
 
 from dotenv import load_dotenv  # type: ignore
 
@@ -82,13 +83,13 @@ def poll_recording() -> dict:
 
 
 @app.route('/transcribe/', methods=['POST'])
-def transcribe() -> dict:
+async def transcribe() -> dict:
     body = json.loads(request.data)
     print("got request in transcribe:", body)
     print('sending recording to deepgram')
     # submit the recording to deepgram
     client = Deepgram(DEEPGRAM_API_KEY)
-    deepgram_res = client.transcription.prerecorded({"url": body["audio_url"]}, {"punctuate": True})
+    deepgram_res = await client.transcription.prerecorded({"url": body["audio_url"]}, {"punctuate": True})
     print('done processing request, sending deepgram response back to client',
           deepgram_res)
     return deepgram_res
